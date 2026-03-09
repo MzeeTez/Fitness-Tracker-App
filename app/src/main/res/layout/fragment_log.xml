@@ -56,11 +56,11 @@
             app:strokeWidth="1dp">
 
             <EditText
-                android:id="@+id/inputSteps"
+                android:id="@+id/inputDuration"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:background="@null"
-                android:hint="Steps Taken"
+                android:hint="Duration (mins)"
                 android:inputType="number"
                 android:paddingHorizontal="20dp"
                 android:textColor="#FFFFFF"

@@ -13,9 +13,10 @@ public interface FitnessDao {
     @Query("SELECT * FROM fitness_records WHERE date = :todayDate")
     List<FitnessRecord> getRecordsForDate(String todayDate);
 
-    @Query("SELECT SUM(caloriesBurned) FROM fitness_records WHERE date = :todayDate")
+    // FIX: Add COALESCE to prevent NullPointerException when the database is empty
+    @Query("SELECT COALESCE(SUM(caloriesBurned), 0) FROM fitness_records WHERE date = :todayDate")
     int getTotalCaloriesForDate(String todayDate);
 
-    @Query("SELECT SUM(steps) FROM fitness_records WHERE date = :todayDate")
+    @Query("SELECT COALESCE(SUM(steps), 0) FROM fitness_records WHERE date = :todayDate")
     int getTotalStepsForDate(String todayDate);
 }

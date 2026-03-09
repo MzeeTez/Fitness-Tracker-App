@@ -1,83 +1,48 @@
 package com.example.fitnesstrackerapp;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import androidx.fragment.app.Fragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-
-    private AppDatabase db;
-    private ProgressBar progressSteps, progressCalories;
-    private TextView textSteps, textCalories;
-    private EditText inputExercise, inputSteps, inputCalories;
-    private String todayDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize DB
-        db = AppDatabase.getDatabase(this);
-        todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
 
-        // Initialize UI components
-//        progressSteps = findViewById(R.id.progressSteps);
-////        progressCalories = findViewById(R.id.progressCalories);
-//        textSteps = findViewById(R.id.textSteps);
-//        textCalories = findViewById(R.id.textCalories);
-//
-//        inputExercise = findViewById(R.id.inputExercise);
-//        inputSteps = findViewById(R.id.inputSteps);
-//        inputCalories = findViewById(R.id.inputCalories);
-//        Button btnSave = findViewById(R.id.btnSave);
-
-        updateDashboard();
-
-//        btnSave.setOnClickListener(v -> saveActivity());
-    }
-
-    private void saveActivity() {
-        String exercise = inputExercise.getText().toString();
-        String stepsStr = inputSteps.getText().toString();
-        String calsStr = inputCalories.getText().toString();
-
-        if (exercise.isEmpty() && stepsStr.isEmpty() && calsStr.isEmpty()) {
-            Toast.makeText(this, "Please enter some data", Toast.LENGTH_SHORT).show();
-            return;
+        // Load HomeFragment as the default view on launch
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment())
+                    .commit();
         }
 
-        FitnessRecord record = new FitnessRecord();
-        record.date = todayDate;
-        record.exerciseType = exercise;
-        record.steps = stepsStr.isEmpty() ? 0 : Integer.parseInt(stepsStr);
-        record.caloriesBurned = calsStr.isEmpty() ? 0 : Integer.parseInt(calsStr);
+        // Handle navigation item clicks
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
 
-        db.fitnessDao().insert(record);
-        Toast.makeText(this, "Activity Saved!", Toast.LENGTH_SHORT).show();
+            if (itemId == R.id.nav_home) {
+                selectedFragment = new HomeFragment();
+            } else if (itemId == R.id.nav_log) {
+                selectedFragment = new LogFragment();
+            } else if (itemId == R.id.nav_stats) {
+                selectedFragment = new StatsFragment();
+            } else if (itemId == R.id.nav_profile) {
+                selectedFragment = new ProfileFragment();
+            }
 
-        // Clear inputs and refresh dashboard
-        inputExercise.setText("");
-        inputSteps.setText("");
-        inputCalories.setText("");
-        updateDashboard();
-    }
-
-    private void updateDashboard() {
-        int totalSteps = db.fitnessDao().getTotalStepsForDate(todayDate);
-        int totalCalories = db.fitnessDao().getTotalCaloriesForDate(todayDate);
-
-        progressSteps.setProgress(totalSteps);
-        textSteps.setText(totalSteps + " / 10000");
-
-        progressCalories.setProgress(totalCalories);
-        textCalories.setText(totalCalories + " / 2500");
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
+                return true;
+            }
+            return false;
+        });
     }
 }

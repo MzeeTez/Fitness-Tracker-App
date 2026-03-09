@@ -22,7 +22,7 @@ public class LogFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_log, container, false);
 
         EditText inputExercise = view.findViewById(R.id.inputExercise);
-        EditText inputSteps = view.findViewById(R.id.inputSteps);
+        EditText inputDuration = view.findViewById(R.id.inputDuration);
         EditText inputCalories = view.findViewById(R.id.inputCalories);
         Button btnSave = view.findViewById(R.id.btnSave);
 
@@ -31,10 +31,10 @@ public class LogFragment extends Fragment {
 
         btnSave.setOnClickListener(v -> {
             String exercise = inputExercise.getText().toString();
-            String stepsStr = inputSteps.getText().toString();
+            String durationStr = inputDuration.getText().toString();
             String calsStr = inputCalories.getText().toString();
 
-            if (exercise.isEmpty() && stepsStr.isEmpty() && calsStr.isEmpty()) {
+            if (exercise.isEmpty() && durationStr.isEmpty() && calsStr.isEmpty()) {
                 Toast.makeText(requireContext(), "Enter some data", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -42,14 +42,15 @@ public class LogFragment extends Fragment {
             FitnessRecord record = new FitnessRecord();
             record.date = todayDate;
             record.exerciseType = exercise;
-            record.steps = stepsStr.isEmpty() ? 0 : Integer.parseInt(stepsStr);
+            // Map the input to workoutDurationMinutes instead of steps
+            record.workoutDurationMinutes = durationStr.isEmpty() ? 0 : Integer.parseInt(durationStr);
             record.caloriesBurned = calsStr.isEmpty() ? 0 : Integer.parseInt(calsStr);
 
             db.fitnessDao().insert(record);
             Toast.makeText(requireContext(), "Activity Saved!", Toast.LENGTH_SHORT).show();
 
             inputExercise.setText("");
-            inputSteps.setText("");
+            inputDuration.setText("");
             inputCalories.setText("");
         });
 
